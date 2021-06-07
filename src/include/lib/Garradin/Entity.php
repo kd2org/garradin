@@ -57,7 +57,7 @@ class Entity extends AbstractEntity
 		return parent::filterUserValue($type, $value, $key);
 	}
 
-	protected function assert(?bool $test, string $message = null): void
+	protected function assert(?bool $test, string $message = null, int $code = 0): void
 	{
 		if ($test) {
 			return;
@@ -71,7 +71,7 @@ class Entity extends AbstractEntity
 			throw new \UnexpectedValueException($message);
 		}
 		else {
-			throw new ValidationException($message);
+			throw new ValidationException($message, $code);
 		}
 	}
 

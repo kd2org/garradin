@@ -80,8 +80,9 @@ class Reminder extends Entity
 				'select' => 'm.email',
 			],
 			'date' => [
-				'label' => 'Date',
-				'select' => 'srs.date',
+				'label' => 'Date d\'envoi',
+				'select' => 'srs.sent_date',
+				'order' => 'srs.sent_date %s, srs.id %1$s',
 			],
 		];
 

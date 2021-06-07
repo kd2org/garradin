@@ -14,6 +14,7 @@ use Garradin\Membres\Session;
 use Garradin\Static_Cache;
 use Garradin\Utils;
 use Garradin\Entities\Web\Page;
+use Garradin\Web\Render\Render;
 
 use Garradin\Files\Files;
 
@@ -72,13 +73,6 @@ class File extends Entity
 	const THUMB_SIZE_TINY = 200;
 	const THUMB_SIZE_SMALL = 500;
 
-	const FILE_EXT_ENCRYPTED = '.skriv.enc';
-	const FILE_EXT_SKRIV = '.skriv';
-
-	const EDITOR_WEB = 'web';
-	const EDITOR_ENCRYPTED = 'encrypted';
-	const EDITOR_CODE = 'code';
-
 	const CONTEXT_DOCUMENTS = 'documents';
 	const CONTEXT_USER = 'user';
 	const CONTEXT_TRANSACTION = 'transaction';
@@ -125,7 +119,7 @@ class File extends Entity
 	];
 
 	// https://book.hacktricks.xyz/pentesting-web/file-upload
-	const FORBIDDEN_EXTENSIONS = '!cgi|exe|sh|bash|com|pif|jspx?|js[wxv]|action|do|php(?:s|\d+)?|pht|phtml?|shtml|phar|htaccess|inc|cfml?|cfc|dbm|swf|pl|perl|py|pyc|asp|so!i';
+	const FORBIDDEN_EXTENSIONS = '!^(?:cgi|exe|sh|bash|com|pif|jspx?|js[wxv]|action|do|php(?:s|\d+)?|pht|phtml?|shtml|phar|htaccess|inc|cfml?|cfc|dbm|swf|pl|perl|py|pyc|asp|so)$!i';
 
 	static public function getColumns(): array
 	{
@@ -296,10 +290,7 @@ class File extends Entity
 		if (substr($this->mime, 0, 5) == 'text/') {
 			$content = $source_content !== null ? $source_content : Files::callStorage('fetch', $this);
 
-			if ($this->customType() == self::FILE_EXT_ENCRYPTED) {
-				$content = null;
-			}
-			else if ($this->mime === 'text/html' || $this->mime == 'text/xml') {
+			if ($this->mime === 'text/html' || $this->mime == 'text/xml') {
 				$content = strip_tags($content);
 			}
 		}
@@ -700,23 +691,17 @@ class File extends Entity
 
 	public function render(array $options = [])
 	{
-		$type = $this->customType();
-		/*
-		if (substr($this->name, -strlen(self::FILE_EXT_HTML)) == self::FILE_EXT_HTML) {
-			return \Garradin\Web\Render\HTML::render($this, null, $options);
-		}*/
+		$editor_type = $this->renderFormat();
 
-		if ($type == self::FILE_EXT_SKRIV) {
-			return \Garradin\Web\Render\Skriv::render($this, null, $options);
-		}
-		else if ($type == self::FILE_EXT_ENCRYPTED) {
-			return \Garradin\Web\Render\EncryptedSkriv::render($this, null);
-		}
-		else if (substr($this->mime, 0, 5) == 'text/') {
+		if ($editor_type == 'text') {
 			return sprintf('<pre>%s</pre>', htmlspecialchars($this->fetch()));
 		}
-
-		throw new \LogicException('Cannot render file of this type');
+		elseif (!$editor_type) {
+			throw new \LogicException('Cannot render file of this type');
+		}
+		else {
+			return Render::render($editor_type, $this, $this->fetch(), $options);
+		}
 	}
 
 	public function checkReadAccess(?Session $session): bool
@@ -844,21 +829,6 @@ class File extends Entity
 		return false;
 	}
 
-	public function getEditor(): ?string
-	{
-		if ($this->customType() == self::FILE_EXT_SKRIV) {
-			return self::EDITOR_WEB;
-		}
-		elseif ($this->customType() == self::FILE_EXT_ENCRYPTED) {
-			return self::EDITOR_ENCRYPTED;
-		}
-		elseif (substr($this->mime, 0, 5) == 'text/') {
-			return self::EDITOR_CODE;
-		}
-
-		return null;
-	}
-
 	static public function filterName(string $name): string
 	{
 		return preg_replace('/[^\w\d\p{L}_. -]+/iu', '-', $name);
@@ -906,14 +876,33 @@ class File extends Entity
 		return [$context, $ref ?: null, $name];
 	}
 
-	public function customType(): ?string
+	public function renderFormat(): ?string
 	{
-		static $extensions = [self::FILE_EXT_ENCRYPTED, self::FILE_EXT_SKRIV];
+		if (substr($this->name, -6) == '.skriv') {
+			$format = Render::FORMAT_SKRIV;
+		}
+		elseif (substr($this->name, -3) == '.md') {
+			$format = Render::FORMAT_MARKDOWN;
+		}
+		else if (substr($this->mime, 0, 5) == 'text/') {
+			$format = 'text';
+		}
+		else {
+			$format = null;
+		}
 
-		foreach ($extensions as $ext) {
-			if (substr($this->name, -strlen($ext)) == $ext) {
-				return $ext;
-			}
+		return $format;
+	}
+
+	public function editorType(): ?string
+	{
+		$format = $this->renderFormat();
+
+		if ($format == 'text') {
+			return 'code';
+		}
+		elseif ($format == Render::FORMAT_SKRIV || $format == Render::FORMAT_MARKDOWN) {
+			return 'web';
 		}
 
 		return null;

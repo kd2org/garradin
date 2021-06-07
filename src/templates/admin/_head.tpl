@@ -104,10 +104,10 @@
             <li class="main config{if $current == 'config'} current{elseif $current_parent == 'config'} current_parent{/if}"><a href="{$admin_url}config/"><b class="icn">☸</b><i> Configuration</i></a>
         {/if}
 
-        <li class="{if $current == 'mes_infos'} current{elseif $current_parent == 'mes_infos'} current_parent{/if}">
-            <a href="{$admin_url}mes_infos.php"><b class="icn">👤</b><i> Mes infos personnelles</i></a>
+        <li class="{if $current == 'me'} current{elseif $current_parent == 'me'} current_parent{/if}">
+            <a href="{$admin_url}me/"><b class="icn">👤</b><i> Mes infos personnelles</i></a>
             <ul>
-                <li{if $current == 'my_services'}  class="current"{/if}><a href="{$admin_url}my_services.php">Mes activités &amp; cotisations</a></li>
+                <li{if $current == 'me/services'}  class="current"{/if}><a href="{$admin_url}me/services.php">Mes activités &amp; cotisations</a></li>
             </ul>
         </li>
 

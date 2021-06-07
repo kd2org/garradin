@@ -43,6 +43,9 @@
 	<li>
 		<figure>
 			<a href="{$file->url()}" data-name="{$file.name}" data-insert="image" data-thumb="{$file->thumb_url()}"><img src="{$file->thumb_url()}" alt="" title="{$file.name}" /></a>
+			<figcaption>
+				<a href="{$file->url()}" data-name="{$file.name}" data-insert="image" data-thumb="{$file->thumb_url()}">{$file.name}</a>
+			</figcaption>
 			<form class="actions" method="post" action="{$self_url}">
 				{linkbutton shape="download" label="Télécharger" href=$file->url() target="_blank"}
 				{linkbutton shape="plus" label="Insérer" href=$file->url() data-name=$file.name data-insert="image" data-thumb=$file->thumb_url()}

@@ -1,7 +1,7 @@
 <?php
 namespace Garradin;
 
-require_once __DIR__ . '/_inc.php';
+require_once __DIR__ . '/../_inc.php';
 
 $csrf_key = 'edit_my_info';
 
@@ -21,11 +21,11 @@ $form->runIf('save', function () use ($session) {
 	}
 
 	$session->editUser($data);
-}, $csrf_key, '!mes_infos.php');
+}, $csrf_key, '!me/?ok');
 
 $data = $session->getUser();
 $champs = Config::getInstance()->get('champs_membres')->getAll();
 
 $tpl->assign(compact('csrf_key', 'champs', 'data'));
 
-$tpl->display('admin/mes_infos_modifier.tpl');
+$tpl->display('me/edit.tpl');

@@ -16,7 +16,7 @@ if (!$file->checkWriteAccess($session)) {
 	throw new UserException('Vous n\'avez pas le droit de modifier ce fichier.');
 }
 
-$editor = $file->getEditor();
+$editor = $file->editorType();
 $csrf_key = 'edit_file_' . $file->pathHash();
 
 $form->runIf('content', function () use ($file) {

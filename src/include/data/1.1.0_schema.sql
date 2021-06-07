@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS users_categories
     hidden INTEGER NOT NULL DEFAULT 0
 );
 
-CREATE INDEX users_categories_hidden ON users_categories (hidden);
+CREATE INDEX IF NOT EXISTS users_categories_hidden ON users_categories (hidden);
 
 -- Membres de l'asso
 -- Table dynamique générée par l'application
@@ -110,10 +110,11 @@ CREATE TABLE IF NOT EXISTS services_reminders_sent
     id_service INTEGER NOT NULL REFERENCES services (id) ON DELETE CASCADE,
     id_reminder INTEGER NOT NULL REFERENCES services_reminders (id) ON DELETE CASCADE,
 
-    date TEXT NOT NULL DEFAULT CURRENT_DATE CHECK (date(date) IS NOT NULL AND date(date) = date)
+    sent_date TEXT NOT NULL DEFAULT CURRENT_DATE CHECK (date(sent_date) IS NOT NULL AND date(sent_date) = sent_date),
+    due_date TEXT NOT NULL CHECK (date(due_date) IS NOT NULL AND date(due_date) = due_date)
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS srs_index ON services_reminders_sent (id_user, id_service, id_reminder, date);
+CREATE UNIQUE INDEX IF NOT EXISTS srs_index ON services_reminders_sent (id_user, id_service, id_reminder, due_date);
 
 CREATE INDEX IF NOT EXISTS srs_reminder ON services_reminders_sent (id_reminder);
 CREATE INDEX IF NOT EXISTS srs_user ON services_reminders_sent (id_user);
@@ -324,11 +325,12 @@ CREATE TABLE IF NOT EXISTS web_pages
     content TEXT NOT NULL
 );
 
-CREATE UNIQUE INDEX web_pages_path ON web_pages (path);
-CREATE UNIQUE INDEX web_pages_file_path ON web_pages (file_path);
-CREATE INDEX web_pages_parent ON web_pages (parent);
-CREATE INDEX web_pages_published ON web_pages (published);
-CREATE INDEX web_pages_title ON web_pages (title);
+CREATE UNIQUE INDEX IF NOT EXISTS web_pages_path ON web_pages (path);
+CREATE UNIQUE INDEX IF NOT EXISTS web_pages_uri ON web_pages (uri);
+CREATE UNIQUE INDEX IF NOT EXISTS web_pages_file_path ON web_pages (file_path);
+CREATE INDEX IF NOT EXISTS web_pages_parent ON web_pages (parent);
+CREATE INDEX IF NOT EXISTS web_pages_published ON web_pages (published);
+CREATE INDEX IF NOT EXISTS web_pages_title ON web_pages (title);
 
 -- FIXME: rename to english
 CREATE TABLE IF NOT EXISTS recherches

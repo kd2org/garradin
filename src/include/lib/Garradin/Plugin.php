@@ -490,7 +490,16 @@ class Plugin
 			$condition = strtr($row->menu_condition, $permissions);
 
 			$condition = preg_replace_callback('/\{\$user\.(\w+)\}/', function ($m) use ($user, $db) {
-				return property_exists($user, $m[1]) ? $db->quote($user->{$m[1]}) : 'NULL';
+				$prop = $m[1];
+				if (!property_exists($user, $prop)) {
+					return 'NULL';
+				}
+
+				if (substr($prop, 0, 5) == 'perm_') {
+					return (int) $user->$prop;
+				}
+
+				return $db->quote($user->$prop);
 			}, $condition);
 
 			$query = 'SELECT 1 WHERE ' . $condition . ';';

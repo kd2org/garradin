@@ -1,4 +1,4 @@
-{include file="admin/_head.tpl" title="Mes activités & cotisations" current="my_services"}
+{include file="admin/_head.tpl" title="Mes activités & cotisations" current="me/services"}
 
 <dl class="cotisation">
 	<dt>Mes activités et cotisations</dt>

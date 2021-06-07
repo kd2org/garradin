@@ -6,6 +6,10 @@
 		{linkbutton shape="plus" label="Nouvelle page" href="new.php?type=%d&parent=%d"|args:$type_page,$page.path}
 		{linkbutton shape="plus" label="Nouvelle catégorie" href="new.php?type=%d&parent=%d"|args:$type_category,$page.path}
 	</aside>
+	{else}
+	<aside>
+		{linkbutton href="?p=%s&toggle_type"|args:$page.path label="Transformer en catégorie" shape="reset"}
+	</aside>
 	{/if}
 	<ul>
 		<li><a href="{$admin_url}web/?p={$page.parent}">Retour à la liste</a></li>

@@ -12,6 +12,8 @@ use Garradin\UserException;
 
 class Import
 {
+	protected $champs;
+
 	/**
 	 * Importer un CSV générique
 	 * @return boolean                   TRUE en cas de succès
@@ -154,7 +156,7 @@ class Import
 						$v = trim($v);
 						$found = array_search($v, $champs_multiples[$name]->options);
 
-						if ($found) {
+						if ($found !== false) {
 							$data[$name] |= 0x01 << $found;
 						}
 					}
@@ -242,22 +244,30 @@ class Import
 	}
 
 	public function exportRow(\stdClass $row) {
-		// Pas hyper efficace, il faudrait ne pas récupérer la liste pour chaque ligne... FIXME
-		$champs_multiples = Config::getInstance()->get('champs_membres')->getMultiples();
+		if (null === $this->champs) {
+			$this->champs = Config::getInstance()->get('champs_membres')->getAll();
+		}
 
-		// convertir les champs à choix multiple de binaire vers liste séparée par des points virgules
-		foreach ($champs_multiples as $id=>$config) {
-			$out = [];
-
-			foreach ($config->options as $b => $name)
-			{
-				if ($row->$id & (0x01 << $b)) {
-					$out[] = $name;
-				}
+		foreach ($this->champs as $id => $config) {
+			if ($config->type == 'date') {
+				$row->$id = \DateTime::createFromFormat('!Y-m-d', $row->$id);
 			}
+			elseif ($config->type == 'datetime') {
+				$row->$id = \DateTime::createFromFormat('!Y-m-d H:i:s', $row->$id);
+			}
+			// convertir les champs à choix multiple de binaire vers liste séparée par des points virgules
+			elseif ($config->type == 'multiple') {
+				$out = [];
 
-			$row->$id = implode(';', $out);
+				foreach ($config->options as $b => $name)
+				{
+					if ($row->$id & (0x01 << $b)) {
+						$out[] = $name;
+					}
+				}
 
+				$row->$id = implode(';', $out);
+			}
 		}
 
 		return $row;

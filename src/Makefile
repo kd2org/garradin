@@ -13,6 +13,8 @@ deps:
 	rm -rf ${TMP_KD2}
 
 	wget -O "include/lib/Parsedown.php" "https://raw.githubusercontent.com/erusev/parsedown/1.7.x/Parsedown.php"
+
+	wget -O "include/lib/Parsedown.php" "https://raw.githubusercontent.com/erusev/parsedown/1.7.x/Parsedown.php"
 	wget -O "include/lib/ParsedownExtra.php" "https://raw.githubusercontent.com/erusev/parsedown-extra/0.8.x/ParsedownExtra.php"
 
 dev-server:

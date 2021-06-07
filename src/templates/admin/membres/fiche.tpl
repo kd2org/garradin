@@ -35,6 +35,11 @@
             {linkbutton href="!services/save.php?user=%d"|args:$membre.id label="Inscrire à une activité" shape="plus"}
         {/if}
     </dd>
+    {if count($services)}
+    <dd>
+        {linkbutton shape="alert" label="Liste des rappels envoyés" href="!services/reminders/user.php?id=%d"|args:$membre.id}
+    </dd>
+    {/if}
     {if $session->canAccess($session::SECTION_USERS, $session::ACCESS_READ)}
         {if !empty($transactions_linked)}
             <dt>Écritures comptables liées</dt>

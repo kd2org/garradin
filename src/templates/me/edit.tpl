@@ -1,9 +1,9 @@
-{include file="admin/_head.tpl" title="Mes informations personnelles" current="mes_infos"}
+{include file="admin/_head.tpl" title="Mes informations personnelles" current="me"}
 
 <nav class="tabs">
 	<ul>
-		<li class="current"><a href="{$admin_url}mes_infos.php">Mes informations personnelles</a></li>
-		<li><a href="{$admin_url}mes_infos_securite.php">Mot de passe et options de sécurité</a></li>
+		<li class="current"><a href="{$admin_url}me/">Mes informations personnelles</a></li>
+		<li><a href="{$admin_url}me/security.php">Mot de passe et options de sécurité</a></li>
 	</ul>
 </nav>
 
@@ -24,7 +24,7 @@
 
 	<fieldset>
 		<legend>Changer mon mot de passe</legend>
-		<p><a href="{$admin_url}mes_infos_securite.php">Modifier mon mot de passe ou autres informations de sécurité.</a></p>
+		<p><a href="{$admin_url}me/security.php">Modifier mon mot de passe ou autres informations de sécurité.</a></p>
 	</fieldset>
 
 	<p class="submit">

@@ -15,6 +15,7 @@ class Utils
     const EMAIL_CONTEXT_SYSTEM = 'system';
 
     static protected $collator;
+    static protected $transliterator;
 
     const FRENCH_DATE_NAMES = [
         'January'=>'Janvier', 'February'=>'Février', 'March'=>'Mars', 'April'=>'Avril', 'May'=>'Mai',
@@ -902,19 +903,35 @@ class Utils
         }
 
         if (isset(self::$collator)) {
-            return self::$collator->compare($a, $b);
+            return (int) self::$collator->compare($a, $b);
         }
 
-        if (function_exists('\mb_convert_case')) {
-            $a = \mb_convert_case($a, \MB_CASE_LOWER);
-            $b = \mb_convert_case($b, \MB_CASE_LOWER);
-        }
-        else {
-            $a = strtoupper(self::transliterateToAscii($a));
-            $b = strtoupper(self::transliterateToAscii($b));
-        }
+        $a = strtoupper(self::transliterateToAscii($a));
+        $b = strtoupper(self::transliterateToAscii($b));
 
         return strcmp($a, $b);
+    }
+
+    /**
+     * Transforms a unicode string to lowercase AND removes all diacritics
+     *
+     * @see https://www.matthecat.com/supprimer-les-accents-d-une-chaine-avec-php.html
+     */
+    static public function unicodeCaseFold(?string $str): string
+    {
+        if (null === $str || trim($str) === '') {
+            return '';
+        }
+
+        if (!isset(self::$transliterator) && function_exists('transliterator_create')) {
+            self::$transliterator = \Transliterator::create('Any-Latin; NFD; [:Nonspacing Mark:] Remove; NFC; [:Punctuation:] Remove; Lower();');
+        }
+
+        if (isset(self::$transliterator)) {
+            return self::$transliterator->transliterate($str);
+        }
+
+        return strtoupper(self::transliterateToAscii($str));
     }
 
     static public function knatcasesort(array $array)

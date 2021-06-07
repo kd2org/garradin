@@ -13,6 +13,12 @@ if (!$page) {
 	throw new UserException('Page inconnue');
 }
 
+if (qg('toggle_type') !== null) {
+	$page->toggleType();
+	$page->save();
+	Utils::redirect('!web/page.php?p=' . $page->path);
+}
+
 $membres = new Membres;
 
 $tpl->assign('breadcrumbs', $page->getBreadcrumbs());

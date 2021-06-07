@@ -417,6 +417,8 @@ class Sauvegarde
 				'Message d\'erreur de SQLite : ' . $e->getMessage(), self::NOT_A_DB);
 		}
 
+		DB::registerCustomFunctions($db);
+
 		try {
 			// Regardons ensuite si la base de données n'est pas corrompue
 			$check = $db->querySingle('PRAGMA integrity_check;', false);
@@ -430,7 +432,7 @@ class Sauvegarde
 
 		if (strtolower(trim($check)) != 'ok')
 		{
-			throw new UserException('Le fichier fourni est corrompu. SQLite a trouvé ' . $check . ' erreurs.');
+			throw new UserException('Le fichier fourni est corrompu. Erreur SQLite : ' . $check);
 		}
 
 		if ($check_foreign_keys)

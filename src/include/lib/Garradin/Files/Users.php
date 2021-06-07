@@ -19,6 +19,10 @@ class Users
 		],
 		'path' => [
 		],
+		'id' => [
+			'label' => null,
+			'select' => 'm.id',
+		],
 	];
 
 	static public function list()

@@ -11,6 +11,7 @@ use Garradin\Entities\Files\File;
 use Garradin\Entities\Web\Page;
 
 use KD2\DB\EntityManager as EM;
+use KD2\ZipWriter;
 
 use const Garradin\{FILE_STORAGE_BACKEND, FILE_STORAGE_QUOTA, FILE_STORAGE_CONFIG};
 
@@ -56,6 +57,49 @@ class Files
 
 		// Update this path
 		return self::callStorage('list', $parent);
+	}
+
+	static public function zip(string $parent, ?Session $session)
+	{
+		$file = Files::get($parent);
+
+		if (!$file) {
+			throw new UserException('Ce répertoire n\'existe pas.');
+		}
+
+		if ($session && !$file->checkReadAccess($session)) {
+			throw new UserException('Vous n\'avez pas accès à ce répertoire');
+		}
+
+		$zip = new ZipWriter('php://output');
+		$zip->setCompression(0);
+
+		$add_file = function ($subpath) use ($zip, $parent, &$add_file) {
+			foreach (self::list($subpath) as $file) {
+				if ($file->type == $file::TYPE_DIRECTORY) {
+					$add_file($file->path);
+					continue;
+				}
+
+				$dest_path = substr($file->path, strlen($parent . '/'));
+				$zip->add($dest_path, null, $file->fullpath());
+			}
+		};
+
+		$add_file($parent);
+
+		$zip->close();
+	}
+
+	static public function listForContext(string $context, ?string $ref = null)
+	{
+		$path = $context;
+
+		if ($ref) {
+			$path .= '/' . $ref;
+		}
+
+		return self::list($path);
 	}
 
 	static public function delete(string $path): void
@@ -291,7 +335,7 @@ class Files
 		$db->begin();
 		$db->exec('CREATE TEMP TABLE IF NOT EXISTS tmp_files AS SELECT * FROM files WHERE 0;');
 
-		foreach (Files::list(File::CONTEXT_TRANSACTION) as $file) {
+		foreach (Files::list($parent) as $file) {
 			$db->insert('tmp_files', $file->asArray(true));
 		}
 

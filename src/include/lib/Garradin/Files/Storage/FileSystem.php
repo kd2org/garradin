@@ -212,6 +212,44 @@ class FileSystem implements StorageInterface
 		return Utils::knatcasesort($files);
 	}
 
+	static public function listDirectoriesRecursively(string $path): array
+	{
+		$fullpath = self::_getRoot() . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $path);
+		$fullpath = rtrim($fullpath, DIRECTORY_SEPARATOR);
+
+		if (!file_exists($fullpath)) {
+			return [];
+		}
+
+		return self::_recurseGlob($fullpath, '*', \GLOB_ONLYDIR);
+	}
+
+	static protected function _recurseGlob(string $path, string $pattern = '*', int $flags = 0): array
+	{
+		$target = $path . DIRECTORY_SEPARATOR . $pattern;
+		$list = [];
+
+		// glob is the fastest way to recursely list directories and files apparently
+		// after comparing with opendir(), dir() and filesystem recursive iterators
+		foreach(glob($target, $flags) as $file) {
+			$file = basename($file);
+
+			if ($file[0] == '.') {
+				continue;
+			}
+
+			$list[] = $file;
+
+			if (is_dir($path . DIRECTORY_SEPARATOR . $file)) {
+				foreach (self::_recurseGlob($path . DIRECTORY_SEPARATOR . $file, $pattern, $flags) as $subfile) {
+					$list[] = $file . DIRECTORY_SEPARATOR . $subfile;
+				}
+			}
+		}
+
+		return $list;
+	}
+
 	static public function getTotalSize(): float
 	{
 		if (null !== self::$_size) {

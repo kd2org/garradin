@@ -58,7 +58,7 @@ use Garradin\Entities\Files\File;
 	</aside>
 </nav>
 
-{if !$can_mkdir && !$context_ref}
+{if !$can_mkdir && !$context_ref && $can_upload}
 <p class="block alert">
 	Il n'est pas possible de créer de répertoire ici.
 	{if $context == File::CONTEXT_USER}
@@ -129,7 +129,7 @@ use Garradin\Entities\Files\File;
 					<td>{$file.mime}</td>
 					<td>{$file.size|size_in_bytes}</td>
 					<td class="actions">
-						{if $can_write && $file->getEditor()}
+						{if $can_write && $file->editorType()}
 							{linkbutton href="!common/files/edit.php?p=%s"|args:$file.path label="Modifier" shape="edit" target="_dialog" data-dialog-height="90%"}
 						{/if}
 						{if $file->canPreview()}
@@ -154,7 +154,7 @@ use Garradin\Entities\Files\File;
 				<tr>
 					<td class="check"><input type="checkbox" value="Tout cocher / décocher" id="f_all2" /><label for="f_all2"></label></td>
 					<td class="actions" colspan="5">
-						<em>Pour les fichiers cochés :</em>
+						<em>Pour les fichiers sélectionnés&nbsp;:</em>
 							<input type="hidden" name="parent" value="{$path}" />
 							<select name="action">
 								<option value="">— Choisir une action à effectuer —</option>
@@ -193,7 +193,7 @@ use Garradin\Entities\Files\File;
 					<th><a href="?p={$item.path}">{$item.identity}</a></th>
 					<td class="actions">
 						{linkbutton href="!docs/?p=%s"|args:$item.path label="Fichiers" shape="menu"}
-						{linkbutton href="!membres/fiche.php?id=%d"|args:$item.number label="Fiche membre" shape="user"}
+						{linkbutton href="!membres/fiche.php?id=%d"|args:$item.id label="Fiche membre" shape="user"}
 					</td>
 				{/if}
 			</tr>
@@ -203,6 +203,9 @@ use Garradin\Entities\Files\File;
 
 	{/if}
 
+	<p class="actions">
+		{linkbutton href="!docs/zip.php?p=%s"|args:$path label="Télécharger ce répertoire (ZIP)" shape="download"}
+	</p>
 
 </form>
 {else}

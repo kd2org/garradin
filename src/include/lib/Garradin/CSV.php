@@ -156,13 +156,18 @@ class CSV
 
 		if (!($iterator instanceof \Iterator) || $iterator->valid()) {
 			foreach ($iterator as $row) {
+				$row = self::rowToArray($row, $row_map_callback);
+
 				foreach ($row as $key => &$v) {
 					if (is_object($v) && $v instanceof \DateTimeInterface) {
-						$v = $v->format('d/m/Y');
+						if ($v->format('His') == '000000') {
+							$v = $v->format('d/m/Y');
+						}
+						else {
+							$v = $v->format('d/m/Y H:i:s');
+						}
 					}
 				}
-
-				$row = self::rowToArray($row, $row_map_callback);
 
 				if (!$header)
 				{

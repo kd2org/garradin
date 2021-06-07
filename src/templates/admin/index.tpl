@@ -4,8 +4,8 @@
 
 <nav class="tabs">
 	<ul>
-		<li><a href="{$admin_url}mes_infos.php">Modifier mes informations personnelles</a></li>
-		<li><a href="{$admin_url}my_services.php">Suivi de mes activités et cotisations</a></li>
+		<li><a href="{$admin_url}me/">Modifier mes informations personnelles</a></li>
+		<li><a href="{$admin_url}me/services.php">Suivi de mes activités et cotisations</a></li>
 	</ul>
 </nav>
 

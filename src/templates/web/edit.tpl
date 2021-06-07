@@ -14,20 +14,17 @@
 		<dl>
 			{input type="text" name="title" source=$page required=true label="Titre"}
 			{input type="text" name="uri" default=$page.uri required=true label="Adresse unique URI" help="Utilisée pour désigner l'adresse de la page sur le site. Ne peut comporter que des lettres, des chiffres, des tirets et des tirets bas." pattern="[A-Za-z0-9_-]+"}
-			{input type="list" name="parent" label="Catégorie" default=$parent target="web/_selector.php?current=%s"|args:$page.path required=true}
+			{input type="list" name="parent" label="Catégorie" default=$parent target="web/_selector.php?current=%s&parent=%s"|args:$page.path,$page.parent required=true}
 			{input type="datetime" name="date" label="Date" required=true default=$page.published}
 			<dt>Statut</dt>
 			{input type="radio" name="status" value=$page::STATUS_ONLINE label="En ligne" source=$page}
 			{input type="radio" name="status" value=$page::STATUS_DRAFT label="Brouillon" source=$page help="ne sera pas visible sur le site"}
+			{input type="select" name="format" options=$formats source=$page label="Format"}
 		</dl>
 	</fieldset>
 
 	<fieldset class="wikiEncrypt">
 		<dl>
-			<dt>
-				<input type="checkbox" name="encryption" id="f_encryption" {if $encrypted} checked="checked"{/if} value="1" onchange="checkEncryption(this);" />
-				<label for="f_encryption">Chiffrer le contenu</label> <i>(facultatif)</i>
-			</dt>
 			<noscript>
 			<dd>Nécessite JavaScript activé pour fonctionner !</dd>
 			</noscript>
@@ -40,7 +37,7 @@
 
 	<fieldset class="wikiText">
 		<div class="textEditor">
-			{input type="textarea" name="content" cols="70" rows="35" default=$new_content data-attachments=1 data-savebtn=2 data-preview-url="!common/files/_preview.php?w=%s"|local_url|args:$page.path}
+			{input type="textarea" name="content" cols="70" rows="35" default=$new_content data-attachments=1 data-savebtn=2 data-preview-url="!common/files/_preview.php?w=%s"|local_url|args:$page.path data-format="#f_format"}
 		</div>
 	</fieldset>
 

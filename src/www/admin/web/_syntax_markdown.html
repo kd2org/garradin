@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Syntaxe SkrivML</title>
+  <style type="text/css">
+  body, form, p, div, hr, fieldset, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6 {
+      margin: 0;
+      padding: 0;
+  }
+  h1  { font-size: 2em; }
+  h2  { font-size: 1.5em; }
+  h3  { font-size: 1.2em; }
+  h4  { font-size: 1em; }
+  h5  { font-size: 0.9em; }
+  h6  { font-size: 0.8em; }
+  article, aside, figure, footer, header, hgroup, menu, nav, section { display: block; }
+
+  body {
+    font-family: "Trebuchet MS", Arial, Helvetica, Sans-serif;
+    padding: .8em;
+  }
+  pre, samp {
+    display: block;
+    background: #ccc;
+    color: #000;
+    border-radius: .5em;
+    padding: .4em;
+  }
+
+  code {
+    background: #ccc;
+    padding: .2em;
+  }
+
+  samp {
+    background: #999;
+    font-family: "Trebuchet MS", Arial, Helvetica, Sans-serif;
+  }
+
+  p, header, article {
+    margin: .8em 0;
+    clear: both;
+  }
+
+  h1, h2, h3, h4, samp, pre {
+    margin: .4em 0;
+  }
+
+  ul, ol {
+    margin-left: 1.5em;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+  table td, table th {
+    border: 1px solid #666;
+    padding: .3em;
+  }
+
+  a {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  </style>
+</head>
+
+<body>
+
+<section>
+  <h1>Raccourcis clavier</h1>
+  <table>
+    <tbody>
+      <tr>
+        <th><kbd>Ctrl</kbd> + <kbd>G</kbd></th>
+        <td>Mettre en gras</td>
+      </tr>
+      <tr>
+        <th><kbd>Ctrl</kbd> + <kbd>I</kbd></th>
+        <td>Mettre en italique</td>
+      </tr>
+      <tr>
+        <th><kbd>Ctrl</kbd> + <kbd>T</kbd></th>
+        <td>Mettre en titre</td>
+      </tr>
+      <tr>
+        <th><kbd>Ctrl</kbd> + <kbd>L</kbd></th>
+        <td>Mettre en lien</td>
+      </tr>
+      <tr>
+        <th><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>I</kbd></th>
+        <td>Insérer un fichier ou image</td>
+      </tr>
+      <tr>
+        <th><kbd>Ctrl</kbd> + <kbd>P</kbd></th>
+        <td>Prévisualiser</td>
+      </tr>
+      <tr>
+        <th><kbd>Ctrl</kbd> + <kbd>S</kbd></th>
+        <td>Enregistrer</td>
+      </tr>
+      <tr>
+        <th><kbd>Echap</kbd></th>
+        <td>Fermer l'aide, la prévisualisation ou l'insertion de fichier</td>
+      </tr>
+      <tr>
+        <th><kbd>F11</kbd></th>
+        <td>Activer ou désactiver l'édition plein écran</td>
+      </tr>
+      <tr>
+        <th><kbd>F1</kbd></th>
+        <td>Afficher l'aide</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Extensions Markdown</h2>
+  <h3>Sommaire / table des matières automatique</h3>
+  <p>Il suffit de placer la mention <code>[toc]</code> ou <code>[sommaire]</code> sur une ligne (sans aucun autre texte) pour afficher un sommaire automatique de la page&nbsp;:</p>
+<div class="toc"><ol><li><a href="#La-syntaxe-markdown">La syntaxe markdown</a></li><ol><li><a href="#Styles-de-texte">Styles de texte</a></li><li><a href="#Blocs-de-code">Blocs de code</a></li><li><a href="#Liens">Liens</a></li><li><a href="#Images">Images</a></li><li><a href="#Citation">Citation</a></li><li><a href="#Listes">Listes</a></li><li><a href="#Titres">Titres</a></li><li><a href="#Tableaux">Tableaux</a></li></ol></ol></div>
+  <h3>Images</h3>
+  <p>Il est possible d'intégrer une image jointe à la page web en plaçant le code suivant sur une ligne (sans autre texte)&nbsp;:</p>
+  <pre>&lt;&lt;image|nom_fichier.jpg|alignement|Légende&gt;&gt;</pre>
+  <p><code>nom_fichier.jpg</code> indique le nom du fichier de l'image</p>
+  <p><code>alignement</code> indique l'alignement de l'image peut être <code>centre</code>, <code>gauche</code>, ou <code>droite</code></p>
+  <p><code>Légende</code> indique une légende facultative à afficher en dessous de l'image</p>
+  <h3>Fichiers</h3>
+  <p>Pour créer un bouton permettant de voir ou télécharger un fichier joint à la page web, il suffit d'utiliser la syntaxe suivante :</p>
+  <pre>&lt;&lt;fichier|nom_fichier.pdf|Légende&gt;&gt;</pre>
+  <p><code>nom_fichier.jpg</code> indique le nom du fichier</p>
+  <p><code>Légende</code> indique une légende facultative pour le texte du bouton, si aucune légende n'est donnée alors c'est le nom du fichier qui sera affiché</p>
+  <h3>Notes de bas de page</h3>
+  <pre>Texte très intéressant[^1]<br><br>[^1]: Ceci est une note de bas de page</pre>
+</section>
+
+<section>
+
+<div class="web-content"><h1>La syntaxe markdown</h1>
+<p>Pour formater votre texte vous avez la possibilité d'utiliser la barre d'outils située au-dessus de la zone de texte, ou vous pouvez utiliser la syntaxe markdown.</p>
+<h2>Styles de texte</h2>
+<p>Vous pouvez utiliser <code>_</code> ou <code>*</code> autour d'un mot pour le mettre en italique. Mettez-en deux pour le mettre en gras.</p>
+<ul>
+<li><code>_italique_</code> s'affiche ainsi&nbsp;: <em>italique</em></li>
+<li><code>**gras**</code> s'affiche ainsi&nbsp;: <strong>gras</strong></li>
+<li><code>**_gras-italique_**</code> s'affiche ainsi&nbsp;: <strong><em>gras-italique</em></strong></li>
+<li><code>~~barré~~</code> s'affiche ainsi&nbsp;: <del>barré</del></li>
+</ul>
+<h2>Blocs de code</h2>
+<p>Créez un bloc de code en indentant chaque ligne avec quatre espaces, ou en mettant trois accents graves sur la ligne au dessus et en dessous de votre code.<br>
+Exemple :</p>
+<p><code>```<br />bloc de code<br />```</code></p>
+<p>s'affiche ainsi :</p>
+<pre>bloc de code</pre>
+<h2>Liens</h2>
+<p>Créez un lien intégré en mettant le texte désiré entre crochets et le lien associé entre parenthèses.</p>
+<p><code>Je connais un super gestionnaire [d'association](https://garradin.eu/) !</code></p>
+<p>s'affichera :</p>
+<p>Je connais un super gestionnaire <a href="https://garradin.eu/">d'association</a> !</p>
+<h2>Images</h2>
+<p>Utilisez une image en ligne en copiant son adresse (finissant par <code>.jpg</code>, <code>.png</code>, <code>.gif</code> etc…) avec un texte alternatif entre crochets (qui sera affiché si l'image n'apparaît pas) et le lien entre parenthèses.</p>
+<pre>![Logo Garradin](https://fossil.kd2.org/garradin/logo)</pre>
+<p>donnera :</p>
+<p><img src="https://fossil.kd2.org/garradin/logo" alt="Logo Garradin"></p>
+<h2>Citation</h2>
+<p>Les citations se font avec le signe <code>&gt;</code> :</p>
+<pre>&gt; Ah je ris de me voir si belle !</pre>
+<blockquote>
+<p>Ah je ris de me voir si belle !</p>
+</blockquote>
+<h2>Listes</h2>
+<p>Vous pouvez créer des listes avec les caractères <code>*</code> et <code>-</code> pour des listes non ordonnées ou avec des nombres pour des listes ordonnées.</p>
+<p>Une liste non ordonnée :</p>
+<pre>* une élément
+* un autre
+ * un sous élément
+ * un autre sous élément
+* un dernier élément</pre>
+<ul>
+<li>une élément</li>
+<li>un autre
+<ul>
+<li>un sous élément</li>
+<li>un autre sous élément</li>
+</ul></li>
+<li>un dernier élément</li>
+</ul>
+<p>Une liste ordonnée :</p>
+<pre>1. élément un
+2. élément deux</pre>
+<ol>
+<li>élément un</li>
+<li>élément deux</li>
+</ol>
+<h2>Titres</h2>
+<p>Pour faire un titre, vous devez mettre un <code>#</code> devant la ligne. Pour faire un titre plus petit, ajoutez un <code>#</code> (jusque 6) :</p>
+<pre># Un grand titre
+## Un titre un peu moins grand
+### Un titre encore moins grand</pre>
+<h2>Tableaux</h2>
+<p>Pour créer un tableau vous devez placer une ligne de tirets (<code>-</code>) sous la ligne d'entête et séparer les colonnes avec des <code>|</code>. Vous pouvez aussi préciser l'alignement en utilisant des <code>:</code>. :</p>
+<pre>| Aligné à gauche  | Centré          | Aligné à droite |
+| :--------------- |:---------------:| -----:|
+| Aligné à gauche  |   ce texte        |  Aligné à droite |
+| Aligné à gauche  | est             |   Aligné à droite |
+| Aligné à gauche  | centré          |    Aligné à droite |</pre>
+<table>
+<thead>
+<tr>
+<th style="text-align&nbsp;: left;">Aligné à gauche</th>
+<th style="text-align&nbsp;: center;">Centré</th>
+<th style="text-align&nbsp;: right;">Aligné à droite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align&nbsp;: left;">Aligné à gauche</td>
+<td style="text-align&nbsp;: center;">ce texte</td>
+<td style="text-align&nbsp;: right;">Aligné à droite</td>
+</tr>
+<tr>
+<td style="text-align&nbsp;: left;">Aligné à gauche</td>
+<td style="text-align&nbsp;: center;">est</td>
+<td style="text-align&nbsp;: right;">Aligné à droite</td>
+</tr>
+<tr>
+<td style="text-align&nbsp;: left;">Aligné à gauche</td>
+<td style="text-align&nbsp;: center;">centré</td>
+<td style="text-align&nbsp;: right;">Aligné à droite</td>
+</tr>
+</tbody>
+</table></div>
+</section>
+
+</body>
+</html>

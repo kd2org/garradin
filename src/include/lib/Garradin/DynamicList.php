@@ -108,6 +108,17 @@ class DynamicList implements \Countable
 		}
 	}
 
+	public function asArray(): array
+	{
+		$out = [];
+
+		foreach ($this->iterate(true) as $row) {
+			$out[] = $row;
+		}
+
+		return $out;
+	}
+
 	public function paginationURL()
 	{
 		return Utils::getModifiedURL('?p=[ID]');

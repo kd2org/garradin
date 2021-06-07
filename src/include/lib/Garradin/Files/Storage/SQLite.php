@@ -125,6 +125,18 @@ class SQLite implements StorageInterface
 		return EM::getInstance(File::class)->all('SELECT * FROM @TABLE WHERE parent = ? ORDER BY type DESC, name COLLATE NOCASE ASC;', $path);
 	}
 
+	static public function listDirectoriesRecursively(string $path): array
+	{
+		$files = [];
+		$it = DB::getInstance()->iterate('SELECT path FROM files WHERE parent LIKE ? ORDER BY path;', $path . '/%');
+
+		foreach ($it as $file) {
+			$files[] = $file->path;
+		}
+
+		return $files;
+	}
+
 	static public function exists(string $path): bool
 	{
 		return DB::getInstance()->test('files', 'path = ?', $path);

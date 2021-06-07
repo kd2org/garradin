@@ -1,6 +1,6 @@
 .web-content p, .web-content h1, .web-content h2, .web-content h3, .web-content h4, .web-content h5, .web-content h6,
-.web-content ul, .web-content ol, .web-content table, .web-content blockquote {
-    margin-bottom: .8em;
+.web-content ul, .web-content ol, .web-content table, .web-content blockquote, .web-content pre {
+    margin: .8em 0;
 }
 
 .web-content ul, .web-content ol, .web-content dd {
@@ -13,6 +13,58 @@
 
 .web-content ol {
     list-style-type: decimal;
+}
+
+.web-content blockquote::before {
+    content: "”";
+    color: #999;
+    display: block;
+    position: absolute;
+    font-style: italic;
+    font-size: 3rem;
+    line-height: 2rem;
+    margin-left: -3rem;
+}
+
+.web-content blockquote {
+    font-size: 1.1em;
+    padding-left: 3rem;
+    margin: 1rem 0;
+}
+
+.web-content a.footnote-ref, .web-content .footnotes dt a {
+    color: blue;
+}
+
+.web-content a.footnote-ref::before, .web-content .footnotes dt a::before {
+    content: "[";
+}
+
+.web-content a.footnote-ref::after, .web-content .footnotes dt a::after {
+    content: "]";
+}
+
+.web-content dl.footnotes {
+    display: grid;
+    grid-template-columns: .1fr .9fr;
+    border-top: 2px solid #999;
+    margin-top: 1rem;
+    padding-top: 1rem;
+}
+
+.web-content code {
+    background: rgba(100, 100, 100, 0.2);
+    padding: .2rem;
+}
+
+.web-content dl.footnotes dd {
+    margin: 0;
+    margin-bottom: 1rem;
+}
+
+.web-content dl.footnotes dd p {
+    margin: 0;
+    margin-bottom: 1rem;
 }
 
 .web-content table {
@@ -28,6 +80,26 @@
 .web-content table th {
     background: #eee;
     font-weight: bold;
+}
+
+.web-content .toc {
+    margin: 1rem 0;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.1);
+    padding: .3rem;
+    width: max-content;
+}
+
+.web-content .toc ol {
+    list-style: none;
+    counter-reset: item;
+    margin: .5rem 0 .5rem .5rem;
+}
+
+.web-content .toc ol li:before {
+    content: counters(item, ".") " ";
+    counter-increment: item;
+    color: #666;
 }
 
 .web-content aside.file {

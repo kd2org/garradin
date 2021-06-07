@@ -281,6 +281,48 @@ class Upgrade
 				$config->save();
 			}
 
+			if (version_compare($v, '1.1.7', '<')) {
+				$db->begin();
+				$db->import(ROOT . '/include/data/1.1.7_migration.sql');
+				$db->commit();
+			}
+
+			if (version_compare($v, '1.1.8', '<')) {
+				$db->begin();
+				// Force sync to remove pages that don't exist anymore
+				\Garradin\Web\Web::sync();
+
+				$uris = [];
+				$i = 1;
+
+				$treat_duplicate_uris = function ($path) use (&$i, &$uris, &$treat_duplicate_uris) {
+					// Rename duplicate URIs
+					foreach (Files::callStorage('list', $path) as $f) {
+						if ($f->type != $f::TYPE_DIRECTORY) {
+							continue;
+						}
+
+						if (array_key_exists($f->name, $uris)) {
+							$f->changeFileName($f->name . '_' . $i++);
+						}
+
+						$uris[$f->name] = $f->path;
+
+						$treat_duplicate_uris($f->path);
+					}
+				};
+
+				$treat_duplicate_uris(\Garradin\Entities\Files\File::CONTEXT_WEB);
+
+				// Force sync to add renamed pages
+				\Garradin\Web\Web::sync();
+
+				// Add UNIQUE index
+				$db->import(ROOT . '/include/data/1.1.8_migration.sql');
+
+				$db->commit();
+			}
+
 			// Vérification de la cohérence des clés étrangères
 			$db->foreignKeyCheck();
 

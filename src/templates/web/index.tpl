@@ -44,6 +44,8 @@
 	</p>
 {/if}
 
+{form_errors}
+
 {if count($categories)}
 	<h2 class="ruler">Catégories</h2>
 	<table class="list">
@@ -87,7 +89,7 @@
 				<td>{$p.created|date_short}</td>
 				<td>Modifié {$p.modified|relative_date:true}</td>
 				<td class="actions">
-					{if $p.status == $p::STATUS_ONLINE}
+					{if $p.status == $p::STATUS_ONLINE && !$config.site_disabled}
 						{linkbutton shape="eye" label="Voir sur le site" href=$p->url() target="_blank"}
 					{/if}
 					{linkbutton shape="image" label="Prévisualiser" href="page.php?p=%s"|args:$p.path}
@@ -100,6 +102,10 @@
 			{/foreach}
 		</tbody>
 	</table>
+{/if}
+
+{if !count($categories) && !count($pages)}
+	<p class="alert block">Il n'y a aucune page ou sous-catégorie dans cette catégorie.</p>
 {/if}
 
 

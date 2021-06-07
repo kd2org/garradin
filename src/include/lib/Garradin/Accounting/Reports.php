@@ -225,12 +225,13 @@ class Reports
 		return (int)$a - (int)$b * -1;
 	}
 
-	static public function getClosingSumsWithAccounts(array $criterias, ?string $order = null, bool $reverse = false): array
+	static public function getClosingSumsWithAccounts(array $criterias, ?string $order = null, bool $reverse = false, bool $remove_zero = true): array
 	{
 		$where = self::getWhereClause($criterias);
 
 		$order = $order ?: 'a.code COLLATE NOCASE';
 		$reverse = $reverse ? '* -1' : '';
+		$remove_zero = $remove_zero ? 'HAVING sum != 0' : '';
 
 		// Find sums, link them to accounts
 		$sql = sprintf('SELECT a.id, a.code, a.label, a.position, SUM(l.credit) AS credit, SUM(l.debit) AS debit,
@@ -240,10 +241,15 @@ class Reports
 			INNER JOIN %s a ON a.id = l.id_account
 			WHERE %s
 			GROUP BY l.id_account
-			HAVING sum != 0
+			%s
 			ORDER BY %s;',
-			$reverse, Line::TABLE, Transaction::TABLE, Account::TABLE, $where, $order);
+			$reverse, Line::TABLE, Transaction::TABLE, Account::TABLE, $where, $remove_zero, $order);
 		return DB::getInstance()->getGrouped($sql);
+	}
+
+	static public function getTrialBalance(array $criterias): array
+	{
+		return self::getClosingSumsWithAccounts($criterias, null, false, false);
 	}
 
 	static public function getBalanceSheet(array $criterias): array

@@ -6,6 +6,16 @@ $user_files_path = (new Membres)->getAttachementsDirectory($data->id);
 <dl class="describe">
 	{foreach from=$champs key="c" item="c_config"}
 	<?php
+	// Skip private fields from "my info" page
+	if ($mode == 'user' && $c_config->private) {
+		continue;
+	}
+
+	// Skip files from export
+	if ($mode == 'export' && $c_config->type == 'file') {
+		continue;
+	}
+
 	$value = $data->$c ?? null;
 	?>
 	<dt>{$c_config.title}</dt>

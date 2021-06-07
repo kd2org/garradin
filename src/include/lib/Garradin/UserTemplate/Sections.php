@@ -57,7 +57,7 @@ class Sections
 
 		while ($row = $result->fetchArray(\SQLITE3_ASSOC))
 		{
-			$row['url'] = WWW_URL . $row['path'];
+			$row['url'] = WWW_URL . Utils::basename($row['path']);
 			yield $row;
 		}
 	}

@@ -12,7 +12,8 @@ fieldset legend {
     color: #000;
 }
 
-table tr.clickable:hover {
+/* Override selector in 06-tables.css */
+table tr.clickable:hover, table tr.clickable:nth-child(even):hover {
     cursor: pointer;
     color: #633;
     background: #ffc;

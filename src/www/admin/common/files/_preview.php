@@ -4,7 +4,7 @@ namespace Garradin;
 
 use Garradin\Files\Files;
 use Garradin\Entities\Files\File;
-use Garradin\Web\Render\Skriv;
+use Garradin\Web\Render\Render;
 use Garradin\Web\Web;
 
 require_once __DIR__ . '/../../_inc.php';
@@ -33,7 +33,7 @@ else {
 
 $prefix = $page ? 'web/page.php?uri=' : 'common/files/_preview.php?p=' . File::CONTEXT_DOCUMENTS . '/';
 
-$content = Skriv::render($file, f('content'), ['prefix' => ADMIN_URL . $prefix]);
+$content = Render::render(f('format'), $file, f('content'), ['prefix' => ADMIN_URL . $prefix]);
 
 $tpl->assign(compact('file', 'content'));
 

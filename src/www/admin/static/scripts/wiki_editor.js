@@ -31,7 +31,8 @@
 			fullscreen: t.textarea.getAttribute('data-fullscreen') == 1,
 			attachments: t.textarea.getAttribute('data-attachments') == 1,
 			savebtn: t.textarea.getAttribute('data-savebtn'),
-			preview_url: t.textarea.getAttribute('data-preview-url')
+			preview_url: t.textarea.getAttribute('data-preview-url'),
+			format: t.textarea.getAttribute('data-format')
 		};
 
 		// Cancel Escape to close.value
@@ -72,6 +73,11 @@
 			var form = document.createElement('form');
 			form.appendChild(t.textarea.cloneNode(true));
 			form.firstChild.value = t.textarea.value;
+			let f = document.createElement('input');
+			f.type = 'hidden';
+			f.name = 'format';
+			f.value = config.format;
+			form.appendChild(f);
 			form.target = 'editorFrame';
 			form.action = config.preview_url;
 			form.style.display = 'none';
@@ -83,8 +89,10 @@
 
 		var openSyntaxHelp = function ()
 		{
-			openIFrame(g.admin_url + 'web/_syntaxe.html');
-			return true;
+			let url = config.format == 'markdown' ? '_syntax_markdown.html' : '_syntax_skriv.html';
+			url = g.admin_url + 'web/' + url;
+
+			openIFrame(url);
 		};
 
 		var openFileInsert = function ()
@@ -92,7 +100,6 @@
 			let args = new URLSearchParams(window.location.search);
 			var wiki_id = args.get('p');
 			g.openFrameDialog(g.admin_url + 'web/_attach.php?_dialog&p=' + wiki_id);
-			return true;
 		};
 
 		window.te_insertFile = function (file)
@@ -191,6 +198,23 @@
 			return btn;
 		};
 
+		let applyHeader = () => {
+			wrapTags(config.format == 'markdown' ? '## ' : '== ', '');
+		};
+
+		let applyBold = () => {
+			wrapTags('**', '**');
+		};
+
+		let applyItalic = () => {
+			if (config.format == 'markdown') {
+				wrapTags("_", "_");
+			}
+			else {
+				wrapTags("''", "''");
+			}
+		};
+
 		var wrapTags = function (left, right)
 		{
 			t.wrapSelection(t.getSelection(), left, right);
@@ -198,9 +222,18 @@
 		};
 
 		let insertURL = function () {
-			if (url = window.prompt('Adresse URL ?'))
+			let url = window.prompt('Adresse URL ?');
+
+			if (!url) {
+				return true;
+			}
+
+			if (config.format == 'markdown') {
+				wrapTags("[", "](" + url + ')');
+			}
+			else {
 				wrapTags("[[", "|" + url + ']]');
-			return true;
+			}
 		};
 
 		let save = function () {
@@ -225,38 +258,59 @@
 			return true;
 		};
 
-		appendButton('title', "== Titre", function () { wrapTags("== ", ""); } );
-		appendButton('bold', '**gras**', function () { wrapTags('**', '**'); } );
-		appendButton('italic', "''italique''", function () { wrapTags("''", "''"); } );
-		appendButton('link', "[[lien|http://]]", insertURL);
-		appendButton('ext preview', '👁', openPreview, 'Prévisualiser');
-		appendButton('ext help', '❓', openSyntaxHelp, 'Aide sur la syntaxe');
+		let createToolbar = () => {
+			appendButton('title', "Titre", applyHeader );
+			appendButton('bold', 'Gras', applyBold );
+			appendButton('italic', "Italique", applyItalic );
+			appendButton('link', "Lien", insertURL);
 
-		if (config.attachments) {
-			appendButton('file', "📎 Fichiers", openFileInsert, 'Insérer fichier / image');
-			t.shortcuts.push({ctrl: true, shift: true, key: 'i', callback: openFileInsert});
+			appendButton('ext preview', '👁', openPreview, 'Prévisualiser');
+			appendButton('ext help', '❓', openSyntaxHelp, 'Aide sur la syntaxe');
+
+			if (config.attachments) {
+				appendButton('file', "📎 Fichiers", openFileInsert, 'Insérer fichier / image');
+				t.shortcuts.push({ctrl: true, shift: true, key: 'i', callback: openFileInsert});
+			}
+
+			if (!config.fullscreen) {
+				appendButton('ext fullscreen', 'Plein écran', toggleFullscreen, 'Plein écran');
+			}
+
+			if (config.savebtn == 1) {
+				appendButton('ext save', 'Enregistrer', save, 'Enregistrer');
+			}
+			else if (config.savebtn == 2) {
+				appendButton('ext save', '⇑', save, 'Enregistrer sans fermer');
+			}
+
+			appendButton('ext close', 'Fermer', closeIFrame);
+
+			t.parent.insertBefore(toolbar, t.parent.firstChild);
 		}
 
-		if (!config.fullscreen) {
-			appendButton('ext fullscreen', 'Plein écran', toggleFullscreen, 'Plein écran');
+		let toggleFormat = (format) => {
+			config.format = format;
+			g.toggle('.wikiEncrypt', format == 'skriv/encrypted');
+		};
+
+		if (config.format.substr(0, 1) == '#') {
+			let s = document.querySelector(config.format);
+			s.onchange = () => {
+				toggleFormat(s.value);
+			};
+			toggleFormat(s.value);
+		}
+		else {
+			toggleFormat(config.format);
 		}
 
-		if (config.savebtn == 1) {
-			appendButton('ext save', 'Enregistrer', save, 'Enregistrer');
-		}
-		else if (config.savebtn == 2) {
-			appendButton('ext save', '⇑', save, 'Enregistrer sans fermer');
-		}
-
-		appendButton('ext close', 'Fermer', closeIFrame);
-
-		t.parent.insertBefore(toolbar, t.parent.firstChild);
+		createToolbar();
 
 		t.shortcuts.push({key: 'F11', callback: toggleFullscreen});
-		t.shortcuts.push({ctrl: true, key: 'b', callback: function () { return wrapTags('**', '**'); } });
-		t.shortcuts.push({ctrl: true, key: 'g', callback: function () { return wrapTags('**', '**'); } });
-		t.shortcuts.push({ctrl: true, key: 'i', callback: function () { return wrapTags("''", "''"); } });
-		t.shortcuts.push({ctrl: true, key: 't', callback: function () { return wrapTags("\n== ", "\n"); } });
+		t.shortcuts.push({ctrl: true, key: 'b', callback: applyBold });
+		t.shortcuts.push({ctrl: true, key: 'g', callback: applyBold });
+		t.shortcuts.push({ctrl: true, key: 'i', callback: applyItalic });
+		t.shortcuts.push({ctrl: true, key: 't', callback: applyHeader });
 		t.shortcuts.push({ctrl: true, key: 'l', callback: insertURL});
 		t.shortcuts.push({ctrl: true, key: 's', callback: save});
 		t.shortcuts.push({ctrl: true, shift: true, key: 'p', callback: openPreview});

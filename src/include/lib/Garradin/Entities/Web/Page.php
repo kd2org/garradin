@@ -8,7 +8,7 @@ use Garradin\UserException;
 use Garradin\Utils;
 use Garradin\Entities\Files\File;
 use Garradin\Files\Files;
-use Garradin\Web\Render\Skriv;
+use Garradin\Web\Render\Render;
 
 use KD2\DB\EntityManager as EM;
 
@@ -53,6 +53,7 @@ class Page extends Entity
 
 	const FORMATS_LIST = [
 		self::FORMAT_SKRIV => 'SkrivML',
+		self::FORMAT_MARKDOWN => 'MarkDown',
 		self::FORMAT_ENCRYPTED => 'Chiffré',
 		self::FORMAT_MARKDOWN => 'Markdown',
 	];
@@ -72,6 +73,8 @@ class Page extends Entity
 		self::TYPE_PAGE => 'article.html',
 		self::TYPE_CATEGORY => 'category.html',
 	];
+
+	const DUPLICATE_URI_ERROR = 42;
 
 	protected $_file;
 	protected $_attachments;
@@ -139,19 +142,13 @@ class Page extends Entity
 		if (!$this->file()) {
 			throw new \LogicException('File does not exist: '  . $this->file_path);
 		}
-		if ($this->format == self::FORMAT_SKRIV) {
-			return \Garradin\Web\Render\Skriv::render($this->file(), $this->content, $options);
-		}
-		else if ($this->format == self::FORMAT_ENCRYPTED) {
-			return \Garradin\Web\Render\EncryptedSkriv::render($this->file(), $this->content);
-		}
 
-		throw new \LogicException('Invalid format: ' . $this->format);
+		return Render::render($this->format, $this->file(), $this->content, $options);
 	}
 
 	public function preview(string $content): string
 	{
-		return Skriv::render($this->file(), $content, ['prefix' => '#']);
+		return Render::render($this->format, $this->file(), $content, ['prefix' => '#']);
 	}
 
 	public function filepath(bool $stored = true): string
@@ -203,13 +200,26 @@ class Page extends Entity
 
 	public function save(): bool
 	{
+		$change_parent = null;
+
 		if (isset($this->_modified['uri']) || isset($this->_modified['path'])) {
 			$this->set('file_path', $this->filepath(false));
+			$change_parent = $this->_modified['path'];
 		}
 
 		$current_path = $this->_modified['file_path'] ?? $this->file_path;
 		parent::save();
 		$this->syncFile($current_path);
+
+		// Rename/move children
+		if ($change_parent) {
+			$db = DB::getInstance();
+			$sql = sprintf('UPDATE web_pages
+				SET path = %s || substr(path, %d), parent = %1$s || substr(parent, %2$d)
+				WHERE parent LIKE %s;',
+				$db->quote($this->path), strlen($change_parent) + 1, $db->quote($change_parent . '/%'));
+			$db->exec($sql);
+		}
 
 		return true;
 	}
@@ -233,8 +243,8 @@ class Page extends Entity
 		$this->assert($this->path !== $this->parent, 'Invalid parent page');
 		$this->assert($this->parent === '' || $db->test(self::TABLE, 'path = ?', $this->parent), 'Page parent inexistante');
 
-		$this->assert(!$this->exists() || !$db->test(self::TABLE, 'path = ? AND id != ?', $this->path, $this->id()), 'Cette adresse URI est déjà utilisée par une autre page, merci d\'en choisir une autre : ' . $this->uri);
-		$this->assert($this->exists() || !$db->test(self::TABLE, 'path = ?', $this->path), 'Cette adresse URI est déjà utilisée par une autre page, merci d\'en choisir une autre : ' . $this->path);
+		$this->assert(!$this->exists() || !$db->test(self::TABLE, 'uri = ? AND id != ?', $this->uri, $this->id()), 'Cette adresse URI est déjà utilisée par une autre page, merci d\'en choisir une autre : ' . $this->uri, self::DUPLICATE_URI_ERROR);
+		$this->assert($this->exists() || !$db->test(self::TABLE, 'uri = ?', $this->uri), 'Cette adresse URI est déjà utilisée par une autre page, merci d\'en choisir une autre : ' . $this->uri, self::DUPLICATE_URI_ERROR);
 	}
 
 	public function importForm(array $source = null)
@@ -441,14 +451,33 @@ class Page extends Entity
 
 		$this->set('modified', $file->modified);
 
-		foreach (Files::list($file->parent) as $subfile) {
+		$this->set('type', $this->checkRealType());
+	}
+
+	public function checkRealType(): int
+	{
+		foreach (Files::list(Utils::dirname($this->filepath())) as $subfile) {
 			if ($subfile->type == File::TYPE_DIRECTORY) {
-				$this->set('type', self::TYPE_CATEGORY);
-				return;
+				return self::TYPE_CATEGORY;
 			}
 		}
 
-		$this->set('type', self::TYPE_PAGE); // Default
+		return self::TYPE_PAGE;
+	}
+
+	public function toggleType(): void
+	{
+		$real_type = $this->checkRealType();
+
+		if ($real_type == self::TYPE_CATEGORY) {
+			$this->set('type', $real_type);
+		}
+		elseif ($this->type == self::TYPE_CATEGORY) {
+			$this->set('type', self::TYPE_PAGE);
+		}
+		else {
+			$this->set('type', self::TYPE_CATEGORY);
+		}
 	}
 
 	static public function fromFile(File $file): self

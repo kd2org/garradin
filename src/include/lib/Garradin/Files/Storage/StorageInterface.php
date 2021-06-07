@@ -69,6 +69,12 @@ interface StorageInterface
 	static public function list(string $path): array;
 
 	/**
+	 * Return an array of (string) paths of all subdirectories inside a path
+	 * @param  string $path Parent path
+	 */
+	static public function listDirectoriesRecursively(string $path): array;
+
+	/**
 	 * Moves a file to a new path, when its name or path has changed
 	 */
 	static public function move(File $file, string $new_path): bool;

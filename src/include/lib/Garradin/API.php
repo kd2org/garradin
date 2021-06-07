@@ -17,6 +17,11 @@ class API
 		return $this->body;
 	}
 
+	protected function hasParam(string $param): bool
+	{
+		return array_key_exists($param, $_GET);
+	}
+
 	protected function download()
 	{
 		if ($this->method != 'GET') {
@@ -48,6 +53,53 @@ class API
 		}
 	}
 
+	protected function web(string $uri): ?array
+	{
+		if ($this->method != 'GET') {
+			throw new APIException('Wrong request method', 400);
+		}
+
+		$fn = strtok($uri, '/');
+		$param = strtok('');
+
+		switch ($fn) {
+			case 'list':
+				return ['categories' => Web::listCategories($param), 'pages' => Web::listPages($param)];
+			case 'attachment':
+				$attachment = Web::getAttachmentFromURI($param);
+
+				if (!$attachment) {
+					throw new APIException('Page not found', 404);
+				}
+
+				$attachment->serve();
+				return null;
+			case 'html':
+			case 'page':
+				$page = Web::getByURI($param);
+
+				if (!$page) {
+					throw new APIException('Page not found', 404);
+				}
+
+				if ($fn == 'page') {
+					$out = compact('page');
+
+					if ($this->hasParam('html')) {
+						$out['html'] = $page->render();
+					}
+
+					return $out;
+				}
+
+				// HTML render
+				echo $page->render();
+				return null;
+			default:
+				throw new APIException('Unknown web action', 404);
+		}
+	}
+
 	public function checkAuth(): void
 	{
 		if (!isset($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])) {
@@ -59,7 +111,7 @@ class API
 		}
 	}
 
-	public function dispatch(string $fn)
+	public function dispatch(string $fn, string $uri)
 	{
 		$this->checkAuth();
 
@@ -68,6 +120,8 @@ class API
 				return $this->sql();
 			case 'download':
 				return $this->download();
+			case 'web':
+				return $this->web($uri);
 			default:
 				throw new APIException('Unknown path', 404);
 		}
@@ -84,7 +138,7 @@ class API
 		http_response_code(200);
 
 		try {
-			$return = $api->dispatch($fn);
+			$return = $api->dispatch($fn, strtok(''));
 
 			if (null !== $return) {
 				echo json_encode($return);

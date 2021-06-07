@@ -10,13 +10,16 @@ require_once __DIR__ . '/_inc.php';
 $current_path = qg('p') ?: '';
 $cat = null;
 
-Web::sync($current_path);
-
 if ($current_path) {
 	$cat = Web::get($current_path);
 
 	if (!$cat) {
 		throw new UserException('Catégorie inconnue');
+	}
+}
+else {
+	foreach (Web::sync() as $error) {
+		$form->addError($error);
 	}
 }
 

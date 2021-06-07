@@ -24,7 +24,7 @@ else {
 	$content = $file->fetch();
 }
 
-$editor = $file->getEditor();
+$editor = $file->editorType();
 $csrf_key = 'edit_file_' . $file->pathHash();
 
 $form->runIf('save', function () use ($file, $key) {

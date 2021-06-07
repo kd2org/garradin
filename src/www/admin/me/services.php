@@ -3,7 +3,7 @@ namespace Garradin;
 
 use Garradin\Services\Services_User;
 
-require_once __DIR__ . '/_inc.php';
+require_once __DIR__ . '/../_inc.php';
 
 $tpl->assign('membre', $user);
 
@@ -14,4 +14,4 @@ $tpl->assign(compact('list'));
 
 $tpl->assign('services', Services_User::listDistinctForUser($user->id));
 
-$tpl->display('my_services.tpl');
+$tpl->display('me/services.tpl');

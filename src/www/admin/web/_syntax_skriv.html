@@ -107,7 +107,7 @@
 				<td>Activer ou désactiver l'édition plein écran</td>
 			</tr>
 			<tr>
-				<th><kbd>F11</kbd></th>
+				<th><kbd>F1</kbd></th>
 				<td>Afficher l'aide</td>
 			</tr>
 		</tbody>
@@ -119,6 +119,22 @@
 	<p>Garradin utilise la syntaxe <a href="http://markup.skriv.org/language/syntax">SkrivML</a> pour 
 		le formatage du texte dans le wiki.</p>
 </header>
+
+<section>
+	<h2>Extensions</h2>
+	<h3>Images</h3>
+	<p>Il est possible d'intégrer une image jointe à la page web en plaçant le code suivant sur une ligne (sans autre texte)&nbsp;:</p>
+	<pre>&lt;&lt;image|nom_fichier.jpg|alignement|Légende&gt;&gt;</pre>
+	<p><code>nom_fichier.jpg</code> indique le nom du fichier de l'image</p>
+	<p><code>alignement</code> indique l'alignement de l'image peut être <code>centre</code>, <code>gauche</code>, ou <code>droite</code></p>
+	<p><code>Légende</code> indique une légende facultative à afficher en dessous de l'image</p>
+	<h3>Fichiers</h3>
+	<p>Pour créer un bouton permettant de voir ou télécharger un fichier joint à la page web, il suffit d'utiliser la syntaxe suivante :</p>
+	<pre>&lt;&lt;fichier|nom_fichier.pdf|Légende&gt;&gt;</pre>
+	<p><code>nom_fichier.jpg</code> indique le nom du fichier</p>
+	<p><code>Légende</code> indique une légende facultative pour le texte du bouton, si aucune légende n'est donnée alors c'est le nom du fichier qui sera affiché</p>
+</section>
+
 
 <section>
 	<h2>Styles de base</h2>
@@ -204,8 +220,8 @@
 	</article>
 	<article>
 		<h3>Lien externe</h3>
-		<pre>[[http://garradin.eu/]]</pre>
-		<samp><a>http://garradin.eu/</a></samp>
+		<pre>[[https://garradin.eu/]]</pre>
+		<samp><a>https://garradin.eu/</a></samp>
 	</article>
 </section>
 
